@@ -1,49 +1,809 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Dibujos que Cobran Vida</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            position: relative;
+        }
+
+        .scene {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Sol animado */
+        .sun {
+            position: absolute;
+            top: 50px;
+            right: 100px;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #ffeb3b, #ff9800);
+            border-radius: 50%;
+            animation: sunPulse 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sun:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.8);
+        }
+
+        .sun::before {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 3px solid #ff9800;
+            border-radius: 50%;
+            top: -10px;
+            left: -10px;
+            animation: sunRays 4s linear infinite;
+        }
+
+        @keyframes sunPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes sunRays {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Nube flotante */
+        .cloud {
+            position: absolute;
+            top: 80px;
+            left: 200px;
+            animation: cloudFloat 6s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .cloud:hover {
+            animation-duration: 2s;
+        }
+
+        .cloud-part {
+            background: white;
+            border-radius: 50px;
+            position: absolute;
+            opacity: 0.9;
+        }
+
+        .cloud-part:nth-child(1) { width: 60px; height: 40px; top: 10px; left: 0; }
+        .cloud-part:nth-child(2) { width: 80px; height: 50px; top: 0; left: 30px; }
+        .cloud-part:nth-child(3) { width: 70px; height: 45px; top: 5px; left: 60px; }
+        .cloud-part:nth-child(4) { width: 50px; height: 35px; top: 15px; left: 90px; }
+
+        @keyframes cloudFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Árbol animado */
+        .tree {
+            position: absolute;
+            bottom: 100px;
+            left: 100px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .tree:hover .leaves {
+            animation: treeShake 0.5s ease-in-out;
+        }
+
+        .trunk {
+            width: 20px;
+            height: 80px;
+            background: linear-gradient(to right, #8d6e63, #5d4037);
+            position: relative;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .leaves {
+            width: 100px;
+            height: 80px;
+            background: radial-gradient(circle, #4caf50, #2e7d32);
+            border-radius: 50px;
+            position: absolute;
+            top: -60px;
+            left: -40px;
+            animation: leavesBreeze 4s ease-in-out infinite;
+        }
+
+        @keyframes leavesBreeze {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+        }
+
+        @keyframes treeShake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        /* Mariposa voladora */
+        .butterfly {
+            position: absolute;
+            top: 200px;
+            left: 300px;
+            width: 40px;
+            height: 30px;
+            animation: butterflyFly 8s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .butterfly:hover {
+            animation-duration: 2s;
+        }
+
+        .wing {
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background: linear-gradient(45deg, #e91e63, #9c27b0);
+            border-radius: 50% 20% 50% 20%;
+            animation: wingFlap 0.3s ease-in-out infinite;
+        }
+
+        .wing.left {
+            left: 0;
+            transform-origin: right center;
+        }
+
+        .wing.right {
+            right: 0;
+            transform-origin: left center;
+            transform: scaleX(-1);
+        }
+
+        .butterfly-body {
+            position: absolute;
+            width: 2px;
+            height: 25px;
+            background: #333;
+            left: 19px;
+            top: 2px;
+            border-radius: 1px;
+        }
+
+        @keyframes wingFlap {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(60deg); }
+        }
+
+        @keyframes butterflyFly {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(100px, -50px); }
+            50% { transform: translate(200px, 30px); }
+            75% { transform: translate(50px, -20px); }
+        }
+
+        /* Flor que crece */
+        .flower {
+            position: absolute;
+            bottom: 50px;
+            right: 200px;
+            cursor: pointer;
+            animation: flowerGrow 3s ease-in-out infinite;
+        }
+
+        .flower:hover {
+            animation: flowerDance 1s ease-in-out infinite;
+        }
+
+        .flower-stem {
+            width: 4px;
+            height: 60px;
+            background: linear-gradient(to top, #4caf50, #8bc34a);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+
+        .flower-head {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #ffeb3b, #ff5722);
+            border-radius: 50%;
+            margin: -5px auto 0;
+            position: relative;
+        }
+
+        .petal {
+            position: absolute;
+            width: 15px;
+            height: 8px;
+            background: #e91e63;
+            border-radius: 50% 50% 50% 50%;
+            transform-origin: center bottom;
+        }
+
+        .petal:nth-child(1) { top: -8px; left: 7px; transform: rotate(0deg); }
+        .petal:nth-child(2) { top: -2px; right: -2px; transform: rotate(45deg); }
+        .petal:nth-child(3) { bottom: -2px; right: -2px; transform: rotate(90deg); }
+        .petal:nth-child(4) { bottom: -8px; left: 7px; transform: rotate(135deg); }
+        .petal:nth-child(5) { bottom: -2px; left: -2px; transform: rotate(180deg); }
+        .petal:nth-child(6) { top: -2px; left: -2px; transform: rotate(225deg); }
+
+        @keyframes flowerGrow {
+            0% { transform: scaleY(0.8); }
+            50% { transform: scaleY(1.1); }
+            100% { transform: scaleY(1); }
+        }
+
+        @keyframes flowerDance {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        /* Estrella parpadeante */
+        .star {
+            position: absolute;
+            top: 120px;
+            left: 400px;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 10px solid #ffeb3b;
+            animation: starTwinkle 2s ease-in-out infinite;
+            cursor: pointer;
+            transform: rotate(35deg);
+        }
+
+        .star:hover {
+            animation-duration: 0.5s;
+        }
+
+        .star:before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 3px;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 10px solid #ffeb3b;
+            transform: rotate(-70deg);
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 1; transform: rotate(35deg) scale(1); }
+            50% { opacity: 0.3; transform: rotate(35deg) scale(1.2); }
+        }
+
+        /* Pájaro volador */
+        .bird {
+            position: absolute;
+            top: 150px;
+            left: -50px;
+            width: 30px;
+            height: 20px;
+            animation: birdFly 10s linear infinite;
+            cursor: pointer;
+        }
+
+        .bird:hover {
+            animation-duration: 5s;
+        }
+
+        .bird-body {
+            width: 20px;
+            height: 12px;
+            background: #795548;
+            border-radius: 50% 50% 50% 50%;
+            position: relative;
+        }
+
+        .bird-wing {
+            position: absolute;
+            width: 15px;
+            height: 8px;
+            background: #5d4037;
+            border-radius: 50% 20% 50% 20%;
+            top: -2px;
+            left: -5px;
+            animation: birdWingFlap 0.5s ease-in-out infinite;
+            transform-origin: right center;
+        }
+
+        @keyframes birdWingFlap {
+            0%, 100% { transform: rotateZ(0deg); }
+            50% { transform: rotateZ(-30deg); }
+        }
+
+        @keyframes birdFly {
+            0% { left: -50px; }
+            100% { left: calc(100vw + 50px); }
+        }
+
+        /* Texto informativo */
+        .info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+
+        .info h3 {
+            margin-bottom: 10px;
+            color: #ffeb3b;
+        }
+
+        /* Efectos de partículas */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: particleFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            10%, 90% { opacity: 1; }
+            50% { transform: translateY(-100px) rotate(180deg); }
+        }
+    </style>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/p5@1.11.10/lib/p5.min.js"></script><
 <body>
+    <div class="scene">
+        <!-- Sol animado -->
+        <div class="sun" onclick="sunClick(event)"></div>
 
-    <div><h1>PAINT AESTHETIC</h1>/<div>
-    <h1 style="color: deeppink;">paint girlie</h1>"
-    
+        <!-- Nube flotante -->
+        <div class="cloud" onclick="cloudClick(event)">
+            <div class="cloud-part"></div>
+            <div class="cloud-part"></div>
+            <div class="cloud-part"></div>
+            <div class="cloud-part"></div>
+        </div>
 
-    </body>
-    function setup() {
-  createCanvas(100, 100);
-  background(220);
-  line(0, 0, 400, 400);
-   line(400, 400, 0, 0);
-  describe(linea diagonal");
-   describe(linea diagonal");
+        <!-- Árbol animado -->
+        <div class="tree" onclick="treeClick(event)">
+            <div class="trunk"></div>
+            <div class="leaves"></div>
+        </div>
+
+        <!-- Mariposa voladora -->
+        <div class="butterfly" onclick="butterflyClick(event)">
+            <div class="wing left"></div>
+            <div class="wing right"></div>
+            <div class="butterfly-body"></div>
+        </div>
+
+        <!-- Flor que crece -->
+        <div class="flower" onclick="flowerClick(event)">
+            <div class="flower-head">
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+            </div>
+            <div class="flower-stem"></div>
+        </div>
+
+        <!-- Estrella parpadeante -->
+        <div class="star" onclick="starClick(event)"></div>
+
+        <!-- Pájaro volador -->
+        <div class="bird" onclick="birdClick(event)">
+            <div class="bird-body"></div>
+            <div class="bird-wing"></div>
+        </div>
+
+        <!-- Información -->
+        <div class="info">
+            <h3>🌟 Dibujos Vivos con Sonido</h3>
+            <p>Haz clic en cualquier elemento para escuchar sonidos únicos creados con Tone.js. Cada dibujo tiene su propio instrumento musical y efectos de audio.</p>
+            <p><strong>Nota:</strong> Haz clic en cualquier elemento para activar el audio.</p>
+        </div>
+    </div>
+
     <script>
-           let ageMariana =25;
-           let agelechu =18;
-           let agetotal= 0;
-           let nombrelechu= "lechu";
-           let nombreMariana = "Mariana";
-           console.log(agetotal)
-           console.log(nombrelechu + "tiene " + (agelechu) + "años ");
-           console.log(nombreMariana + "tiene " + (ageMariana) + "años ");
-           console.log("El total de edades es:) " + (agelechu + ageMariana));
-           if (agelechu > ageMariana) {
-                console.log("Lechu es mayor")
-           } else{
-                console.log("Mariana es mayor")
-           }
+        // Inicialización de Tone.js
+        let audioInitialized = false;
+        
+        // Crear diferentes instrumentos y efectos con Tone.js
+        const synth = new Tone.Synth({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.1, decay: 0.2, sustain: 0.3, release: 1 }
+        }).toDestination();
+        
+        const fmSynth = new Tone.FMSynth({
+            harmonicity: 3,
+            modulationIndex: 10,
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.01, decay: 0.01, sustain: 1, release: 0.5 }
+        }).toDestination();
+        
+        const membrane = new Tone.MembraneSynth({
+            pitchDecay: 0.05,
+            octaves: 4,
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }
+        }).toDestination();
+        
+        const pluckSynth = new Tone.PluckSynth({
+            attackNoise: 1,
+            dampening: 4000,
+            resonance: 0.7
+        }).toDestination();
+        
+        const metalSynth = new Tone.MetalSynth({
+            frequency: 200,
+            envelope: { attack: 0.001, decay: 1.4, release: 0.2 },
+            harmonicity: 5.1,
+            modulationIndex: 32,
+            resonance: 4000,
+            octaves: 1.5
+        }).toDestination();
+        
+        const noiseSynth = new Tone.NoiseSynth({
+            noise: { type: "white" },
+            envelope: { attack: 0.1, decay: 0.2, sustain: 0.2, release: 0.3 }
+        }).toDestination();
+        
+        // Efectos adicionales
+        const reverb = new Tone.Reverb(4).toDestination();
+        const delay = new Tone.PingPongDelay("4n", 0.2).toDestination();
+        
+        // Conectar algunos synths a efectos
+        fmSynth.connect(reverb);
+        pluckSynth.connect(delay);
+        
+        // Función para inicializar audio (necesario para navegadores modernos)
+        async function initAudio() {
+            if (!audioInitialized) {
+                await Tone.start();
+                audioInitialized = true;
+                console.log("Audio iniciado");
+            }
+        }
+        
+        // Funciones de sonido específicas para cada elemento
+        function playSunSound() {
+            initAudio().then(() => {
+                // Sonido brillante y cálido del sol
+                synth.triggerAttackRelease("C5", "8n");
+                setTimeout(() => synth.triggerAttackRelease("E5", "8n"), 100);
+                setTimeout(() => synth.triggerAttackRelease("G5", "8n"), 200);
+            });
+        }
+        
+        function playCloudSound() {
+            initAudio().then(() => {
+                // Sonido suave y etéreo de nube
+                fmSynth.triggerAttackRelease("A4", "4n");
+                // Sonido de lluvia
+                setTimeout(() => {
+                    for (let i = 0; i < 8; i++) {
+                        setTimeout(() => {
+                            noiseSynth.triggerAttackRelease("32n");
+                        }, i * 50);
+                    }
+                }, 200);
+            });
+        }
+        
+        function playTreeSound() {
+            initAudio().then(() => {
+                // Sonido natural de madera
+                pluckSynth.triggerAttackRelease("G3", "4n");
+                setTimeout(() => pluckSynth.triggerAttackRelease("D4", "8n"), 150);
+                // Sonido de hojas
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        synth.triggerAttackRelease(`${["C4", "D4", "E4", "F4", "G4"][Math.floor(Math.random() * 5)]}`, "16n");
+                    }, i * 100);
+                }
+            });
+        }
+        
+        function playButterflySound() {
+            initAudio().then(() => {
+                // Sonido delicado y flotante
+                const notes = ["C5", "E5", "G5", "C6"];
+                notes.forEach((note, i) => {
+                    setTimeout(() => {
+                        fmSynth.triggerAttackRelease(note, "16n");
+                    }, i * 80);
+                });
+            });
+        }
+        
+        function playFlowerSound() {
+            initAudio().then(() => {
+                // Sonido dulce y floreciente
+                synth.triggerAttackRelease("F4", "8n");
+                setTimeout(() => synth.triggerAttackRelease("A4", "8n"), 100);
+                setTimeout(() => synth.triggerAttackRelease("C5", "4n"), 200);
+            });
+        }
+        
+        function playStarSound() {
+            initAudio().then(() => {
+                // Sonido brillante y metálico
+                metalSynth.triggerAttackRelease("C6", "8n");
+                // Efectos de destellos
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        synth.triggerAttackRelease(`C${6 + Math.floor(Math.random() * 2)}`, "32n");
+                    }, i * 30);
+                }
+            });
+        }
+        
+        function playBirdSound() {
+            initAudio().then(() => {
+                // Sonido de pájaro cantando
+                const birdNotes = ["G5", "A5", "G5", "E5", "F5"];
+                birdNotes.forEach((note, i) => {
+                    setTimeout(() => {
+                        fmSynth.triggerAttackRelease(note, "16n");
+                    }, i * 60);
+                });
+            });
+        }
+        
+        // Música ambiental de fondo
+        function createAmbientMusic() {
+            initAudio().then(() => {
+                const ambientNotes = ["C3", "E3", "G3", "A3", "C4"];
+                const playAmbientNote = () => {
+                    if (Math.random() > 0.7) { // 30% de probabilidad
+                        const note = ambientNotes[Math.floor(Math.random() * ambientNotes.length)];
+                        fmSynth.triggerAttackRelease(note, "2n");
+                    }
+                };
+                
+                // Reproducir nota ambiental cada 3-8 segundos
+                const scheduleNext = () => {
+                    setTimeout(() => {
+                        playAmbientNote();
+                        scheduleNext();
+                    }, Math.random() * 5000 + 3000);
+                };
+                
+                scheduleNext();
+            });
+        }
+        
+        // Iniciar música ambiental después de 2 segundos
+        setTimeout(createAmbientMusic, 2000);
 
+        // Funciones de interacción con sonidos de Tone.js
+        function sunClick(event) {
+            playSunSound();
+            createParticles(event.target);
+            event.target.style.transform = 'scale(1.5) rotate(180deg)';
+            setTimeout(() => {
+                event.target.style.transform = '';
+            }, 500);
+        }
 
-           // console.log(nombrelechu + )
-           calculateage =() => {
-               //age +=1;
-               agetotal =agelechu +ageMariana
-           }
-           calculateage();
-           console.log(agetotal);
-        </script>
+        function cloudClick(event) {
+            playCloudSound();
+            event.target.style.animation = 'cloudFloat 0.5s ease-in-out infinite';
+            createRainDrops(event.target);
+            setTimeout(() => {
+                event.target.style.animation = 'cloudFloat 6s ease-in-out infinite';
+            }, 2000);
+        }
 
-        </html>
+        function treeClick(event) {
+            playTreeSound();
+            const leaves = event.target.querySelector('.leaves');
+            if (leaves) {
+                leaves.style.animation = 'treeShake 0.3s ease-in-out 3';
+            }
+            createLeafFall(event.target);
+        }
+
+        function butterflyClick(event) {
+            playButterflySound();
+            event.target.style.animation = 'butterflyFly 1s ease-in-out infinite';
+            createSparkles(event.target);
+            setTimeout(() => {
+                event.target.style.animation = 'butterflyFly 8s ease-in-out infinite';
+            }, 3000);
+        }
+
+        function flowerClick(event) {
+            playFlowerSound();
+            event.target.style.animation = 'flowerDance 0.2s ease-in-out 5';
+            createPollen(event.target);
+        }
+
+        function starClick(event) {
+            playStarSound();
+            event.target.style.animation = 'starTwinkle 0.1s ease-in-out 10';
+            createStarBurst(event.target);
+        }
+
+        function birdClick(event) {
+            playBirdSound();
+            event.target.style.animationDuration = '2s';
+            createFeathers(event.target);
+            setTimeout(() => {
+                event.target.style.animationDuration = '10s';
+            }, 4000);
+        }
+
+        // Funciones para crear efectos de partículas
+        function createParticles(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 10; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = (rect.left + rect.width/2) + 'px';
+                particle.style.top = (rect.top + rect.height/2) + 'px';
+                particle.style.background = '#ffeb3b';
+                particle.style.animationDelay = (i * 0.1) + 's';
+                document.body.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 6000);
+            }
+        }
+
+        function createRainDrops(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 15; i++) {
+                const drop = document.createElement('div');
+                drop.style.position = 'absolute';
+                drop.style.width = '2px';
+                drop.style.height = '10px';
+                drop.style.background = '#2196f3';
+                drop.style.borderRadius = '0 0 50% 50%';
+                drop.style.left = (rect.left + Math.random() * rect.width) + 'px';
+                drop.style.top = (rect.bottom) + 'px';
+                drop.style.animation = 'particleFloat 2s ease-out';
+                document.body.appendChild(drop);
+                
+                setTimeout(() => drop.remove(), 2000);
+            }
+        }
+
+        function createLeafFall(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 8; i++) {
+                const leaf = document.createElement('div');
+                leaf.style.position = 'absolute';
+                leaf.style.width = '8px';
+                leaf.style.height = '8px';
+                leaf.style.background = '#4caf50';
+                leaf.style.borderRadius = '50% 0';
+                leaf.style.left = (rect.left + 50 + Math.random() * 30) + 'px';
+                leaf.style.top = (rect.top + 20) + 'px';
+                leaf.style.animation = 'particleFloat 4s ease-out';
+                leaf.style.animationDelay = (i * 0.2) + 's';
+                document.body.appendChild(leaf);
+                
+                setTimeout(() => leaf.remove(), 4000);
+            }
+        }
+
+        function createSparkles(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 12; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'particle';
+                sparkle.style.left = (rect.left + rect.width/2 + (Math.random() - 0.5) * 50) + 'px';
+                sparkle.style.top = (rect.top + rect.height/2 + (Math.random() - 0.5) * 50) + 'px';
+                sparkle.style.background = '#e91e63';
+                sparkle.style.animationDelay = (i * 0.05) + 's';
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => sparkle.remove(), 6000);
+            }
+        }
+
+        function createPollen(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 6; i++) {
+                const pollen = document.createElement('div');
+                pollen.className = 'particle';
+                pollen.style.left = (rect.left + rect.width/2) + 'px';
+                pollen.style.top = (rect.top) + 'px';
+                pollen.style.background = '#ffeb3b';
+                pollen.style.animationDelay = (i * 0.1) + 's';
+                document.body.appendChild(pollen);
+                
+                setTimeout(() => pollen.remove(), 6000);
+            }
+        }
+
+        function createStarBurst(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 8; i++) {
+                const burst = document.createElement('div');
+                burst.style.position = 'absolute';
+                burst.style.width = '3px';
+                burst.style.height = '20px';
+                burst.style.background = '#ffeb3b';
+                burst.style.left = (rect.left + rect.width/2) + 'px';
+                burst.style.top = (rect.top + rect.height/2) + 'px';
+                burst.style.transformOrigin = '50% 100%';
+                burst.style.transform = `rotate(${i * 45}deg)`;
+                burst.style.animation = 'particleFloat 1s ease-out';
+                document.body.appendChild(burst);
+                
+                setTimeout(() => burst.remove(), 1000);
+            }
+        }
+
+        function createFeathers(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 5; i++) {
+                const feather = document.createElement('div');
+                feather.style.position = 'absolute';
+                feather.style.width = '6px';
+                feather.style.height = '12px';
+                feather.style.background = '#795548';
+                feather.style.borderRadius = '50% 50% 50% 0';
+                feather.style.left = (rect.left + rect.width/2) + 'px';
+                feather.style.top = (rect.top + rect.height/2) + 'px';
+                feather.style.animation = 'particleFloat 3s ease-out';
+                feather.style.animationDelay = (i * 0.1) + 's';
+                document.body.appendChild(feather);
+                
+                setTimeout(() => feather.remove(), 3000);
+            }
+        }
+
+        // Crear partículas ambientales aleatorias
+        function createAmbientParticles() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = window.innerHeight + 'px';
+            particle.style.background = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})`;
+            particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            document.body.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 8000);
+        }
+
+        // Crear partículas ambientales cada 2 segundos
+        setInterval(createAmbientParticles, 2000);
+
+        // Cambiar colores del fondo gradualmente
+        let hue = 0;
+        function changeBackgroundColor() {
+            hue = (hue + 1) % 360;
+            document.body.style.background = `linear-gradient(135deg, hsl(${hue}, 60%, 60%) 0%, hsl(${(hue + 60) % 360}, 60%, 50%) 100%)`;
+        }
+
+        setInterval(changeBackgroundColor, 100);
+    </script>
+</body>
+</html>
